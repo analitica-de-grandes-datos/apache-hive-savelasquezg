@@ -15,3 +15,14 @@ Escriba el resultado a la carpeta `output` de directorio de trabajo.
 */
 
 
+DROP TABLE IF EXISTS datos;
+CREATE TABLE data (letter        STRING,
+                   dates         DATE,
+                   value        INT)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t';
+
+LOAD DATA LOCAL INPATH "data.tsv" OVERWRITE INTO TABLE datos;
+
+INSERT OVERWRITE LOCAL DIRECTORY 'output'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+SELECT DISTINCT(value) AS value From datos ORDER BY value ASC LIMIT 5;
