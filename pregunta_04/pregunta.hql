@@ -63,6 +63,6 @@ LOAD DATA LOCAL INPATH 'data0.csv' INTO TABLE tbl0;
 INSERT OVERWRITE LOCAL DIRECTORY 'output'
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
 
-SELECT DISTINCT(a.letra) AS letra FROM (
-SELECT explode(c5) AS letra FROM tbl0) as a 
-ORDER BY a.letra;
+SELECT DISTINCT(a.letter) AS letter FROM (
+SELECT explode(c5) AS letter FROM tbl0) as a 
+ORDER BY a.letter;
