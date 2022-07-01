@@ -3,12 +3,8 @@
 Pregunta
 ===========================================================================
 
-Escriba una consulta que compute la cantidad de registros por letra de la 
-columna 2 y clave de la columna 3; esto es, por ejemplo, la cantidad de 
-registros en tienen la letra `a` en la columna 2 y la clave `aaa` en la 
-columna 3 es:
-
-    a    aaa    5
+Escriba una consulta que retorne para cada valor único de la columna `t0.c2`, 
+los valores correspondientes de la columna `t0.c1`. 
 
 Apache Hive se ejecutará en modo local (sin HDFS).
 
@@ -16,20 +12,51 @@ Escriba el resultado a la carpeta `output` de directorio de trabajo.
 
 */
 
-DROP TABLE IF EXISTS t0;
-CREATE TABLE t0 (
-    c1 STRING,
-    c2 ARRAY<CHAR(1)>, 
-    c3 MAP<STRING, INT>
-    )
-    ROW FORMAT DELIMITED 
-        FIELDS TERMINATED BY '\t'
-        COLLECTION ITEMS TERMINATED BY ','
-        MAP KEYS TERMINATED BY '#'
-        LINES TERMINATED BY '\n';
-LOAD DATA LOCAL INPATH 'data.tsv' INTO TABLE t0;
+DROP TABLE IF EXISTS tbl0;
+CREATE TABLE tbl0 (
+    c1 INT,
+    c2 STRING,
+    c3 INT,
+    c4 DATE,
+    c5 ARRAY<CHAR(1)>, 
+    c6 MAP<STRING, INT>
+)
+ROW FORMAT DELIMITED 
+FIELDS TERMINATED BY ','
+COLLECTION ITEMS TERMINATED BY ':'
+MAP KEYS TERMINATED BY '#'
+LINES TERMINATED BY '\n';
+LOAD DATA LOCAL INPATH 'data0.csv' INTO TABLE tbl0;
+
+DROP TABLE IF EXISTS tbl1;
+CREATE TABLE tbl1 (
+    c1 INT,
+    c2 INT,
+    c3 STRING,
+    c4 MAP<STRING, INT>
+)
+ROW FORMAT DELIMITED 
+FIELDS TERMINATED BY ','
+COLLECTION ITEMS TERMINATED BY ':'
+MAP KEYS TERMINATED BY '#'
+LINES TERMINATED BY '\n';
+LOAD DATA LOCAL INPATH 'data1.csv' INTO TABLE tbl1;
 
 /*
     >>> Escriba su respuesta a partir de este punto <<<
 */
+
+CREATE TABLE result AS 
+
+SELECT c2,SORT_ARRAY(COLLECT_LIST(c1)) FROM tbl0
+GROUP BY c2 ;
+
+INSERT OVERWRITE LOCAL DIRECTORY './output'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+COLLECTION ITEMS TERMINATED BY ':'
+SELECT * FROM result;
+
+INSERT OVERWRITE LOCAL DIRECTORY './output'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+SELECT letra, key, COUNT(1) FROM datos GROUP BY letra, key;
 
